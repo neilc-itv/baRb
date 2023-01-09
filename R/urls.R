@@ -1,0 +1,62 @@
+barb_url_root <- function(){
+  "https://dev.barb-api.co.uk/api/v1"
+}
+
+barb_url_token <- function(){
+  glue::glue("{barb_url_root()}/auth/token/")
+}
+
+barb_url_spots <- function(){
+  glue::glue("{barb_url_root()}/advertising_spots")
+}
+
+barb_url_advertisers <- function(){
+  glue::glue("{barb_url_root()}/advertisers")
+}
+
+barb_login <- function(username = NULL, password = NULL) {
+  if(is.null(username)) username <- Sys.getenv('BARB_API_USERNAME')
+  if(is.null(password)) password <- Sys.getenv('BARB_API_PASSWORD')
+
+  creds <- jsonlite::toJSON(list(email = username, password = password), auto_unbox = TRUE)
+
+  token <- httr::POST(
+    url = barb_url_token(),
+    body = creds,
+    httr::content_type("application/json")
+  )
+
+  token
+}
+
+#' Submit a query to the BARB API (usually not called directly)
+#'
+#' @param url Endpoint URL
+#' @param query List of query parameters
+#'
+#' @return API results json
+#' @export
+#'
+#' @examples
+#' # Example only. You'd use barb_get_spots() for this instead.
+#' raw_json <- barb_query_api(
+#'   "https://dev.barb-api.co.uk/api/v1/advertising_spots",
+#'   list(
+#'     min_transmission_date = "2022-01-01",
+#'     max_transmission_date = "2022-12-31",
+#'     advertiser_name = "PLAYMOBIL UK")
+#' )
+barb_query_api <- function(url, query){
+
+  token = barb_login()
+
+  response <- httr::GET(url = url,
+                        httr::add_headers(Authorization = paste0('Bearer ',
+                                                                 httr::content(token, as = "parsed")$access)),
+                        query = query)
+
+  raw_json <- response %>%
+    httr::content()
+
+  raw_json
+}
