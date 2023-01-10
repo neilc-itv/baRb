@@ -4,15 +4,7 @@
 \alias{barb_get_advertisers}
 \title{Get the list of available advertiser names}
 \usage{
-barb_get_advertisers(
-  min_transmission_date = NULL,
-  max_transmission_date = NULL
-)
-}
-\arguments{
-\item{min_transmission_date}{Min date for the request}
-
-\item{max_transmission_date}{Maax date for the request}
+barb_get_advertisers()
 }
 \value{
 A character vector of advertiser names
@@ -21,5 +13,5 @@ A character vector of advertiser names
 Get the list of available advertiser names
 }
 \examples{
-barb_get_advertisers("2022-01-01", "2022-01-31")
+barb_get_advertisers()
 }

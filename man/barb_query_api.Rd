@@ -4,7 +4,7 @@
 \alias{barb_query_api}
 \title{Submit a query to the BARB API (usually not called directly)}
 \usage{
-barb_query_api(url, query)
+barb_query_api(url, query = list())
 }
 \arguments{
 \item{url}{Endpoint URL}

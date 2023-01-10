@@ -5,51 +5,97 @@
 #' @param advertiser_name Advertiser name. Get names from barb_get_advertisers()
 #' @param additional_filters Additional filters passed to the API as URL parameters
 #'
-#' @return A spots tibble
+#' @return A tibble of TV spots
 #' @export
 #'
 #' @examples
-#' barb_get_spots(
-#'  min_transmission_date = "2022-01-01",
-#'  max_transmission_date = "2022-12-31",
-#'  advertiser_name = "PLAYMOBIL UK")
+#' barb_get_spots(min_transmission_date = "2022-01-01", max_transmission_date = "2022-12-31", advertiser_name = "PLAYMOBIL UK")
 barb_get_spots <- function(min_transmission_date = NULL,
                            max_transmission_date = NULL,
                            advertiser_name = NULL,
                            additional_filters = NULL){
 
-  raw_json <- barb_query_api(
+  api_result <- barb_query_api(
     barb_url_spots(),
     list(
       "min_transmission_date" = min_transmission_date,
       "max_transmission_date" = max_transmission_date,
-      "advertiser_name" = advertiser_name
+      "advertiser_name" = advertiser_name,
+      "limit" = "5000"
     )
   )
 
-spots_parsed <- raw_json$events %>%
-  tidyjson::as_tbl_json() %>%
-  tidyjson::spread_values(panel_region = tidyjson::jstring('panel', 'panel_region')) %>%
-  tidyjson::spread_values(station_name = tidyjson::jstring('station', 'station_name')) %>%
-  tidyjson::spread_values(clearcast_commercial_title = tidyjson::jstring('clearcast_information', 'clearcast_commercial_title')) %>%
-  tidyjson::spread_values(standard_datetime = tidyjson::jstring('spot_start_datetime', 'standard_datetime')) %>%
-  tidyjson::enter_object('audience_views') %>%
-  tidyjson::gather_array() %>%
-  tidyjson::spread_all() %>%
-  tibble::as_tibble()
+  if(is.null(api_result$json$events)) return(NULL)
 
-audiences <- raw_json$audience_categories %>%
-  tidyjson::as_tbl_json() %>%
-  tidyjson::spread_all() %>%
-  tibble::as_tibble()
+  spots <- process_spot_json(api_result)
 
-if(nrow(spots_parsed)==0){
-  return(NULL)
+  #Paginate if necessary
+  while(!is.null(api_result$next_url)){
+    message("Paginating")
+    api_result <- barb_query_api(api_result$next_url)
+
+    api_page <- process_spot_json(api_result)
+
+    spots <- spots %>%
+      dplyr::union_all(api_page)
+  }
+
+  spots
 }
 
-spots_parsed_full <- spots_parsed %>%
-  dplyr::left_join(audiences, by = "audience_code")
+process_spot_json <- function(spot_json){
 
-spots_parsed_full
+  #Extract spot list from json
+  spots_parsed <- spot_json$json$events %>%
+    tidyjson::as_tbl_json() %>%
+    tidyjson::spread_values(panel_region = tidyjson::jstring('panel', 'panel_region')) %>%
+    tidyjson::spread_values(station_name = tidyjson::jstring('station', 'station_name')) %>%
+    tidyjson::spread_values(clearcast_commercial_title = tidyjson::jstring('clearcast_information', 'clearcast_commercial_title')) %>%
+    tidyjson::spread_values(standard_datetime = tidyjson::jstring('spot_start_datetime', 'standard_datetime'))
 
+  #Get audience data for non-zero spots
+  audiences_parsed <- spots_parsed %>%
+    tidyjson::enter_object('audience_views') %>%
+    tidyjson::gather_array() %>%
+    tidyjson::spread_all() %>%
+    tibble::as_tibble()
+
+  #Extract audience names
+  audiences <- spot_json$json$audience_categories %>%
+    tidyjson::as_tbl_json() %>%
+    tidyjson::spread_all() %>%
+    tibble::as_tibble()
+
+  #If all spots were zero rated, return result
+  if(nrow(audiences_parsed)==0){
+    spots_parsed <- spots_parsed %>%
+      dplyr::select(
+        panel_region,
+        station_name,
+        clearcast_commercial_title,
+        standard_datetime
+      )
+    return(spots_parsed)
+  }
+
+  #Pivot audiences to columns and append zero rated spots again
+  spots_audiences <- audiences_parsed %>%
+    dplyr::left_join(audiences, by = "audience_code") %>%
+    dplyr::mutate(kpi_var = audience_size_hundreds) %>%
+    dplyr::select(document.id.x,
+                  panel_region,
+                  station_name,
+                  clearcast_commercial_title,
+                  standard_datetime,
+                  audience_name,
+                  kpi_var) %>%
+    tidyr::pivot_wider(names_from = audience_name, values_from = kpi_var)
+
+  spots_all <- spots_audiences %>%
+    dplyr::union_all(
+      dplyr::filter(spots_parsed, !document.id %in% spots_audiences$document.id.x)
+    ) %>%
+    dplyr::select(-document.id.x)
+
+  spots_all
 }

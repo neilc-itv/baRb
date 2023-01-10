@@ -26,14 +26,14 @@ Sys.setenv(BARB_API_PASSWORD = "password")
 Get a list of available advertisers with:
 
 ```
-barb_get_advertisers("2022-01-01", "2022-01-31")
+barb_get_advertisers()
 ```
 
 And a spot list for a specific advertiser with:
 
 ```
 barb_get_spots(
-  min_transmission_date = "2022-01-01",
+  min_transmission_date = "2022-12-01",
   max_transmission_date = "2022-12-31",
   advertiser_name = "PLAYMOBIL UK")
 ```

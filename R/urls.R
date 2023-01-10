@@ -46,7 +46,7 @@ barb_login <- function(username = NULL, password = NULL) {
 #'     max_transmission_date = "2022-12-31",
 #'     advertiser_name = "PLAYMOBIL UK")
 #' )
-barb_query_api <- function(url, query){
+barb_query_api <- function(url, query = list()){
 
   token = barb_login()
 
@@ -58,5 +58,11 @@ barb_query_api <- function(url, query){
   raw_json <- response %>%
     httr::content()
 
-  raw_json
+  if(length(response$all_headers)==2) {
+    next_url <- response$all_headers[[2]][["headers"]][["x-next"]]
+  } else {
+    next_url <- NULL
+  }
+
+  list(json = raw_json, next_url = next_url)
 }

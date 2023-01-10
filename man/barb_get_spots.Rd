@@ -21,14 +21,11 @@ barb_get_spots(
 \item{additional_filters}{Additional filters passed to the API as URL parameters}
 }
 \value{
-A spots tibble
+A tibble of TV spots
 }
 \description{
 Get a tibble of spots from the BARB API
 }
 \examples{
-barb_get_spots(
- min_transmission_date = "2022-01-01",
- max_transmission_date = "2022-12-31",
- advertiser_name = "PLAYMOBIL UK")
+barb_get_spots(min_transmission_date = "2022-01-01", max_transmission_date = "2022-12-31", advertiser_name = "PLAYMOBIL UK")
 }
