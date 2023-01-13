@@ -58,11 +58,8 @@ barb_query_api <- function(url, query = list()){
   raw_json <- response %>%
     httr::content()
 
-  if(length(response$all_headers)==2) {
-    next_url <- response$all_headers[[2]][["headers"]][["x-next"]]
-  } else {
-    next_url <- NULL
-  }
+    # Get URL for the next page of results (if there is one)
+    next_url <- response$all_headers[[length(response$all_headers)]][["headers"]][["x-next"]]
 
   list(json = raw_json, next_url = next_url)
 }
