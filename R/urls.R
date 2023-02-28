@@ -1,5 +1,5 @@
 barb_url_root <- function(){
-  "https://dev.barb-api.co.uk/api/v1"
+  "https://barb-api.co.uk/api/v1"
 }
 
 barb_url_token <- function(){
