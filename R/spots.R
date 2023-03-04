@@ -89,13 +89,18 @@ process_spot_json <- function(spot_json){
                   standard_datetime,
                   audience_name,
                   kpi_var) %>%
-    tidyr::pivot_wider(names_from = audience_name, values_from = kpi_var)
+    tidyr::pivot_wider(names_from = audience_name, values_from = kpi_var) %>%
+    dplyr::rename(document.id = document.id.x)
+
+  spots_parsed_wider <- spots_parsed
+
+  spots_parsed_wider[setdiff(names(spots_audiences), names(spots_parsed))] <- NA
+  spots_parsed_wider <- tibble::as_tibble(spots_parsed_wider)
 
   spots_all <- spots_audiences %>%
     dplyr::union_all(
-      dplyr::filter(spots_parsed, !document.id %in% spots_audiences$document.id.x)
-    ) %>%
-    dplyr::select(-document.id.x)
+      dplyr::filter(spots_parsed_wider, !document.id %in% spots_audiences$document.id)
+    )
 
   spots_all
 }
