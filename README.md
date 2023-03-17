@@ -6,6 +6,8 @@
 
 Functions for working with BARB's TV spot API
 
+### CAUTION: Impact results do not match Advantedge on all channels - query raised with BARB.
+
 ### Installation
 
 ```

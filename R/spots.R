@@ -4,6 +4,7 @@
 #' @param max_transmission_date End date of the spot query
 #' @param advertiser_name Advertiser name. Get names from barb_get_advertisers()
 #' @param additional_filters Additional filters passed to the API as URL parameters
+#' @param macro_regions whether to return macro or standard region areas
 #'
 #' @return A tibble of TV spots
 #' @export
@@ -13,7 +14,8 @@
 barb_get_spots <- function(min_transmission_date = NULL,
                            max_transmission_date = NULL,
                            advertiser_name = NULL,
-                           additional_filters = NULL){
+                           additional_filters = NULL,
+                           macro_regions = FALSE){
 
   api_result <- barb_query_api(
     barb_url_spots(),
@@ -40,7 +42,8 @@ barb_get_spots <- function(min_transmission_date = NULL,
       dplyr::union_all(api_page)
   }
 
-  spots
+  spots %>%
+    dplyr::filter(is_macro_region==macro_regions)
 }
 
 process_spot_json <- function(spot_json){
@@ -49,6 +52,7 @@ process_spot_json <- function(spot_json){
   spots_parsed <- spot_json$json$events %>%
     tidyjson::as_tbl_json() %>%
     tidyjson::spread_values(panel_region = tidyjson::jstring('panel', 'panel_region')) %>%
+    tidyjson::spread_values(is_macro_region = tidyjson::jstring('panel', 'is_macro_region')) %>%
     tidyjson::spread_values(station_name = tidyjson::jstring('station', 'station_name')) %>%
     tidyjson::spread_values(clearcast_commercial_title = tidyjson::jstring('clearcast_information', 'clearcast_commercial_title')) %>%
     tidyjson::spread_values(standard_datetime = tidyjson::jstring('spot_start_datetime', 'standard_datetime'))
@@ -80,10 +84,11 @@ process_spot_json <- function(spot_json){
 
   #Pivot audiences to columns and append zero rated spots again
   spots_audiences <- audiences_parsed %>%
-    dplyr::left_join(audiences, by = "audience_code") %>%
+    dplyr::left_join(audiences, by = c("audience_code")) %>%
     dplyr::mutate(kpi_var = audience_size_hundreds) %>%
     dplyr::select(document.id.x,
                   panel_region,
+                  is_macro_region,
                   station_name,
                   clearcast_commercial_title,
                   standard_datetime,
