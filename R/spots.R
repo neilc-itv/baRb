@@ -5,6 +5,9 @@
 #' @param advertiser_name Advertiser name. Get names from barb_get_advertisers()
 #' @param additional_filters Additional filters passed to the API as URL parameters
 #' @param macro_regions whether to return macro or standard region areas
+#' @param consolidated whether to return consolidated or only live viewing. Defaults to TRUE (consolidated).
+#' @param use_reporting_days whether to use a standard 24 hour clock or the BARB reporting clock. Defaults to FALSE (standard 24 hour clock).
+#' @param standardise_audiences whether to standardise impacts by spot time length. Options are the default of no standardisation (""), "using_duration" or "using_rate_factors".
 #'
 #' @return A tibble of TV spots
 #' @export
@@ -15,7 +18,10 @@ barb_get_spots <- function(min_transmission_date = NULL,
                            max_transmission_date = NULL,
                            advertiser_name = NULL,
                            additional_filters = NULL,
-                           macro_regions = FALSE){
+                           macro_regions = FALSE,
+                           consolidated = TRUE,
+                           use_reporting_days = FALSE,
+                           standardise_audiences = ""){
 
   api_result <- barb_query_api(
     barb_url_spots(),
@@ -23,7 +29,10 @@ barb_get_spots <- function(min_transmission_date = NULL,
       "min_transmission_date" = min_transmission_date,
       "max_transmission_date" = max_transmission_date,
       "advertiser_name" = advertiser_name,
-      "limit" = "5000"
+      "limit" = "5000",
+      "consolidated" = consolidated,
+      "use_reporting_days" = use_reporting_days,
+      "standardise_audiences" = standardise_audiences
     )
   )
 
