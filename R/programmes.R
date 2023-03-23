@@ -68,7 +68,7 @@ process_programme_json <- function(spot_json){
     tidyjson::enter_object('audience_views') %>%
     tidyjson::gather_array() %>%
     tidyjson::spread_values(audience_code = tidyjson::jstring('audience_code')) %>%
-    tidyjson::spread_values(audience_size_hundreds = tidyjson::jstring('audience_size_hundreds')) %>%
+    tidyjson::spread_values(audience_size_hundreds = tidyjson::jdouble('audience_size_hundreds')) %>%
     tibble::as_tibble()
 
   #Extract audience names
