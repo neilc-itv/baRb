@@ -10,6 +10,18 @@ barb_url_spots <- function(){
   glue::glue("{barb_url_root()}/advertising_spots")
 }
 
+barb_url_programmes <- function(){
+  glue::glue("{barb_url_root()}/programme_ratings")
+}
+
+barb_url_meta_panels <- function(){
+  glue::glue("{barb_url_root()}/panels")
+}
+
+barb_url_meta_stations <- function(){
+  glue::glue("{barb_url_root()}/stations")
+}
+
 barb_url_advertisers <- function(){
   glue::glue("{barb_url_root()}/advertisers")
 }
