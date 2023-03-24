@@ -2,6 +2,9 @@
 
 export("%>%")
 export(barb_get_advertisers)
+export(barb_get_panels)
+export(barb_get_programmes)
 export(barb_get_spots)
+export(barb_get_stations)
 export(barb_query_api)
 importFrom(magrittr,"%>%")
