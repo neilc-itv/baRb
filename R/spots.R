@@ -59,7 +59,7 @@ process_spot_json <- function(spot_json){
   spots_parsed <- spot_json$json$events %>%
     tidyjson::as_tbl_json() %>%
     tidyjson::spread_values(panel_region = tidyjson::jstring('panel', 'panel_region')) %>%
-    tidyjson::spread_values(is_macro_region = tidyjson::jstring('panel', 'is_macro_region')) %>%
+    tidyjson::spread_values(is_macro_region = tidyjson::jlogical('panel', 'is_macro_region')) %>%
     tidyjson::spread_values(station_name = tidyjson::jstring('station', 'station_name')) %>%
     tidyjson::spread_values(clearcast_commercial_title = tidyjson::jstring('clearcast_information', 'clearcast_commercial_title')) %>%
     tidyjson::spread_values(standard_datetime = tidyjson::jstring('spot_start_datetime', 'standard_datetime'))
