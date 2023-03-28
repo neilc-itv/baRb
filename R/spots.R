@@ -58,11 +58,19 @@ process_spot_json <- function(spot_json){
   #Extract spot list from json
   spots_parsed <- spot_json$json$events %>%
     tidyjson::as_tbl_json() %>%
-    tidyjson::spread_values(panel_region = tidyjson::jstring('panel', 'panel_region')) %>%
-    tidyjson::spread_values(is_macro_region = tidyjson::jlogical('panel', 'is_macro_region')) %>%
-    tidyjson::spread_values(station_name = tidyjson::jstring('station', 'station_name')) %>%
-    tidyjson::spread_values(clearcast_commercial_title = tidyjson::jstring('clearcast_information', 'clearcast_commercial_title')) %>%
-    tidyjson::spread_values(standard_datetime = tidyjson::jstring('spot_start_datetime', 'standard_datetime'))
+    tidyjson::spread_values(panel_region = tidyjson::jstring('panel', 'panel_region')) |>
+    tidyjson::spread_values(is_macro_region = tidyjson::jlogical('panel', 'is_macro_region'))  |>
+    tidyjson::spread_values(station_name = tidyjson::jstring('station', 'station_name')) |>
+    tidyjson::spread_values(sales_house_name = tidyjson::jstring('sales_house', 'sales_house_name')) |>
+    tidyjson::spread_values(standard_datetime = tidyjson::jstring('spot_start_datetime', 'standard_datetime')) |>
+    tidyjson::spread_values(clearcast_commercial_title = tidyjson::jstring('clearcast_information', 'clearcast_commercial_title')) |>
+    tidyjson::spread_values(preceding_programme_name = tidyjson::jstring('preceding_programme_name')) |>
+    tidyjson::spread_values(spot_duration = tidyjson::jstring('spot_duration')) |>
+    tidyjson::spread_values(break_type = tidyjson::jstring('break_type')) |>
+    tidyjson::spread_values(commercial_number = tidyjson::jstring('commercial_number')) |>
+    tidyjson::spread_values(advertiser_name = tidyjson::jstring('clearcast_information', 'advertiser_name')) |>
+    tidyjson::spread_values(product_name = tidyjson::jstring('clearcast_information', 'product_name')) |>
+    tidyjson::spread_values(clearcast_web_address = tidyjson::jstring('clearcast_information', 'clearcast_web_address'))
 
   #Get audience data for non-zero spots
   audiences_parsed <- spots_parsed %>%
@@ -98,7 +106,15 @@ process_spot_json <- function(spot_json){
                   panel_region,
                   is_macro_region,
                   station_name,
+                  sales_house_name,
                   clearcast_commercial_title,
+                  preceding_programme_name,
+                  spot_duration,
+                  break_type,
+                  commercial_number,
+                  advertiser_name,
+                  product_name,
+                  clearcast_web_address,
                   standard_datetime,
                   audience_name,
                   kpi_var) %>%
