@@ -67,8 +67,6 @@ barb_query_api <- function(url, query = list()){
                                                                  httr::content(token, as = "parsed")$access)),
                         query = query)
 
-  browser()
-
   raw_json <- response %>%
     httr::content()
 
