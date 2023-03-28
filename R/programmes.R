@@ -92,7 +92,10 @@ process_programme_json <- function(spot_json){
                   audience_name,
                   kpi_var) %>%
     tidyr::pivot_wider(names_from = audience_name, values_from = kpi_var) %>%
-    dplyr::rename(document.id = document.id.x)
+    dplyr::rename(document.id = document.id.x) %>%
+    janitor::clean_names()
+
+  spots_audiences[is.na(spots_audiences)] <- 0
 
   spots_audiences
 }

@@ -113,7 +113,10 @@ process_spot_json <- function(spot_json){
   spots_all <- spots_audiences %>%
     dplyr::union_all(
       dplyr::filter(spots_parsed_wider, !document.id %in% spots_audiences$document.id)
-    )
+    ) %>%
+    janitor::clean_names()
+
+  spots_all[is.na(spots_all)] <- 0
 
   spots_all
 }

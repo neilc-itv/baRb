@@ -16,5 +16,6 @@ Imports:
     tidyr,
     httr,
     tibble,
-    tidyjson
+    tidyjson,
+    janitor
 RoxygenNote: 7.2.3
