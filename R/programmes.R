@@ -96,6 +96,7 @@ process_programme_json <- function(spot_json){
     janitor::clean_names()
 
   spots_audiences[is.na(spots_audiences) & is.numeric(spots_audiences)] <- 0
+  spots_audiences[is.na(spots_audiences) & is.character(spots_audiences)] <- ""
 
   spots_audiences
 }
