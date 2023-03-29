@@ -95,7 +95,7 @@ process_programme_json <- function(spot_json){
     dplyr::rename(document.id = document.id.x) %>%
     janitor::clean_names()
 
-  spots_audiences[is.na(spots_audiences)] <- 0
+  spots_audiences[is.na(spots_audiences) & is.numeric(spots_audiences)] <- 0
 
   spots_audiences
 }

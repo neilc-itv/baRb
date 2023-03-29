@@ -132,7 +132,7 @@ process_spot_json <- function(spot_json){
     ) %>%
     janitor::clean_names()
 
-  spots_all[is.na(spots_all)] <- 0
+  spots_all[is.na(spots_all) & is.numeric(spots_all)] <- 0
 
   spots_all
 }
