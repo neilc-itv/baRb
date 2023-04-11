@@ -55,6 +55,8 @@ barb_get_spots <- function(min_transmission_date = NULL,
 
 process_spot_json <- function(spot_json){
 
+  browser()
+
   #Extract spot list from json
   spots_parsed <- spot_json$json$events %>%
     tidyjson::as_tbl_json() %>%
@@ -65,7 +67,7 @@ process_spot_json <- function(spot_json){
     tidyjson::spread_values(standard_datetime = tidyjson::jstring('spot_start_datetime', 'standard_datetime')) |>
     tidyjson::spread_values(clearcast_commercial_title = tidyjson::jstring('clearcast_information', 'clearcast_commercial_title')) |>
     tidyjson::spread_values(preceding_programme_name = tidyjson::jstring('preceding_programme_name')) |>
-    tidyjson::spread_values(spot_duration = tidyjson::jstring('spot_duration')) |>
+    tidyjson::spread_values(spot_duration = tidyjson::jinteger('spot_duration')) |>
     tidyjson::spread_values(break_type = tidyjson::jstring('break_type')) |>
     tidyjson::spread_values(commercial_number = tidyjson::jstring('commercial_number')) |>
     tidyjson::spread_values(advertiser_name = tidyjson::jstring('clearcast_information', 'advertiser_name')) |>
