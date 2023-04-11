@@ -34,7 +34,7 @@ barb_get_spots <- function(min_transmission_date = NULL,
     )
   )
 
-  if(is.null(api_result$json$events)) return(NULL)
+  if(length(api_result$json$events)==0) return(NULL)
 
   spots <- process_spot_json(api_result)
 
@@ -54,8 +54,6 @@ barb_get_spots <- function(min_transmission_date = NULL,
 }
 
 process_spot_json <- function(spot_json){
-
-  browser()
 
   #Extract spot list from json
   spots_parsed <- spot_json$json$events %>%
