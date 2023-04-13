@@ -30,6 +30,10 @@ barb_login <- function(username = NULL, password = NULL) {
   if(is.null(username)) username <- Sys.getenv('BARB_API_USERNAME')
   if(is.null(password)) password <- Sys.getenv('BARB_API_PASSWORD')
 
+  if(username=="" | password==""){
+    stop("Username or password not set")
+  }
+
   creds <- jsonlite::toJSON(list(email = username, password = password), auto_unbox = TRUE)
 
   token <- httr::POST(
