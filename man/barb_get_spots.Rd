@@ -36,5 +36,5 @@ A tibble of TV spots
 Get a tibble of spots from the BARB API
 }
 \examples{
-barb_get_spots(min_transmission_date = "2022-01-01", max_transmission_date = "2022-12-31", advertiser_name = "PLAYMOBIL UK")
+barb_get_spots(min_transmission_date = "2023-01-01", max_transmission_date = "2023-01-31", advertiser_name = "hays_travel")
 }

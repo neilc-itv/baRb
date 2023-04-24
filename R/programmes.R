@@ -11,7 +11,7 @@
 #' @export
 #'
 #' @examples
-#' barb_get_spots(min_transmission_date = "2022-01-01", max_transmission_date = "2022-12-31", advertiser_name = "PLAYMOBIL UK")
+#'
 barb_get_programmes <- function(min_transmission_date = NULL,
                            max_transmission_date = NULL,
                            station_code = "",
