@@ -37,3 +37,5 @@ barb_get_spots(
   max_transmission_date = "2023-01-31",
   advertiser_name = "hays_travel")
 ```
+
+Official documentation for BARB's API can be found [here](https://barb-api.co.uk/api-docs).
