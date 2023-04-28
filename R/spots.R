@@ -45,6 +45,11 @@ barb_get_spots <- function(min_transmission_date = NULL,
 
     api_page <- process_spot_json(api_result)
 
+    # API pages sometimes return fewer audiences than initial calls. Add a col of NA's when this happens.
+    if(ncol(api_page) < ncol(spots)){
+      api_page[, names(spots)[!names(spots) %in% names(api_page)]] <- NA
+    }
+
     spots <- spots %>%
       dplyr::union_all(api_page)
   }
@@ -136,4 +141,52 @@ process_spot_json <- function(spot_json){
   spots_all[is.na(spots_all) & is.character(spots_all)] <- ""
 
   spots_all
+}
+
+
+#' Roll up raw spot data by broadcast time for spot to web modelling
+#'
+#' @param spots A raw spot file
+#' @param plus_one Roll up +1 channels? (T/F)
+#' @param hd Roll up HD channels? (T/F)
+#'
+#' @return A tibble of rolled up spots
+#' @export
+#'
+#' @examples
+barb_rollup_spots <- function(spots, plus_one = TRUE, hd = TRUE){
+  spots_rollup <- spots |>
+    dplyr::mutate(date = as.Date(standard_datetime)) |>
+    dplyr::mutate(dplyr::across(dplyr::where(is.numeric), ~replace(., is.na(.), 0)))
+
+  spots_rollup <- spots_rollup |>
+    dplyr::mutate(parent_station_name = station_name)
+
+  if(plus_one){
+    spots_rollup <- spots_rollup |>
+      dplyr::mutate(parent_station_name = ifelse(parent_station_name=="C4+1", "Channel 4", parent_station_name)) |>
+      dplyr::mutate(parent_station_name = ifelse(parent_station_name=="Dave ja vu", "Dave", parent_station_name)) |>
+      dplyr::mutate(parent_station_name = stringr::str_trim(stringr::str_replace(parent_station_name, "\\+1$", "")))
+  }
+
+  if(hd){
+    spots_rollup <- spots_rollup |>
+      dplyr::mutate(parent_station_name = stringr::str_trim(stringr::str_replace(parent_station_name, "HD$", "")))
+  }
+
+  spots_rollup |>
+    dplyr::group_by(
+             parent_station_name,
+             sales_house_name,
+             clearcast_commercial_title,
+             preceding_programme_name,
+             spot_duration,
+             commercial_number,
+             advertiser_name,
+             product_name,
+             clearcast_web_address,
+             standard_datetime,
+             date) |>
+    dplyr::summarise(impacts = sum(all_adults, na.rm = TRUE)) |>
+    dplyr::ungroup()
 }
